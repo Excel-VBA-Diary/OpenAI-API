@@ -19,7 +19,7 @@ Dim ans As String
 ans = GPT("日本で一番高い山は？")
 ```
 ### 構文  
-GPT((PromptText, \[ModelName\])  
+GPT(PromptText, \[ModelName\])  
   
 GPT関数の書式には、次の引数があります。   
 |  引数  |  説明  |
