@@ -10,8 +10,8 @@ Version 1.00 (September 14, 2026)
 それでも非決定性を容認しつつ利用したいケースはあるだろう。  
   
 ### 前提条件  
-・コード内の OpenAI_API_KEY はご自身で取得したGemini APIキーを割り当てること。  
-・Gemini APIキーは OpenAI Platform で取得する。  
+・コード内の OpenAI_API_KEY はご自身で取得した OpenAI APIキーを割り当てること。  
+・OpenAI APIキーは OpenAI Platform で取得する。  
   
 ### 使用例
 ```
