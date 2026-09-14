@@ -47,7 +47,7 @@ Option Explicit
 '
 '   ModelName: Optional, String
 '              Specify the OpenAI AI model. If omitted,
-'              the default is "gpt-5.6-luna.
+'              the default is "gpt-5.6-luna".
 '
 ' Return Value:
 '   Response (String)
@@ -94,7 +94,7 @@ Public Function GPT(ByVal PromptText As String, _
     model = IIf(ModelName = "", DefaultModel, ModelName)
 
     ' プロンプト内の特殊文字（\, ", CRLF）をJSON用にエスケープする
-    ' Escape special characters (\, ", line breaks) in the prompt for JSON
+    ' Escape special characters (\, ", CRLF) in the prompt for JSON
     
     Dim safePrompt As String
     safePrompt = PromptText
@@ -107,14 +107,14 @@ Public Function GPT(ByVal PromptText As String, _
     ' JSONペイロードの作成
     ' Creating a JSON Payload
     
-    Dim jsonPpayload As String
-    jsonPpayload = _
+    Dim jsonPayload As String
+    jsonPayload = _
     "{""model"":""" & model & """," & _
         """input"":[{" & _
             """role"":""user""," & _
             """content"":[{" & _
                 """type"":""input_text""," & _
-                """text"":""" & PromptText & """" & _
+                """text"":""" & safePrompt & """" & _
                 "}]" & _
             "}]," & _
             """text"":{" & _
@@ -142,7 +142,7 @@ Public Function GPT(ByVal PromptText As String, _
         .setTimeouts 5000, 5000, 10000, 60000
         .setRequestHeader "Content-Type", "application/json; charset=utf-8"
         .setRequestHeader "Authorization", "Bearer " & OpenAI_API_KEY
-        .send StrToUtf8Bytes(jsonPpayload)
+        .send StrToUtf8Bytes(jsonPayload)
         
         If .Status <> 200 Then
             GPT = "#ERROR:" & .Status & ":" & .responseText
@@ -223,7 +223,7 @@ End Function
 ' Although this code is using regular expressions for extraction here,
 ' you can also use a JSON parser.
 
-Function ExtractJsonValue(ByVal JsonText As String, _
+Private Function ExtractJsonValue(ByVal JsonText As String, _
                           ByVal keyName As String) As String
 
     Dim matches As Object, strTemp As String
@@ -260,25 +260,21 @@ Private Function UnescapeUnicode(ByVal EscapedText As String) As String
         .Pattern = "\\u([0-9a-fA-F]{4})"
         .IgnoreCase = True
         .Global = True
-        Dim matches As Object
-        Set matches = .Execute(EscapedText)
     End With
-
-    If matches.Count = 0 Then
-        UnescapeUnicode = ""
-        Exit Function
-    End If
 
     ' マッチした \uXXXX を実際の文字に置き換える
     ' Replace the matched \uXXXX with the actual character
     
-    Dim decodedText As String, hexCode As String, char As String
+    Dim decodedText As String
     decodedText = EscapedText
 
-    Dim match As Object
+    Dim matches As Object
+    Set matches = objRegExp.Execute(EscapedText)
+    
+    Dim match As Object, hexCode As String, char As String
     For Each match In matches
         hexCode = match.SubMatches(0)
-        char = ChrW(CLng("&H" + hexCode))
+        char = ChrW(CLng("&H" & hexCode))
         decodedText = Replace(decodedText, match.Value, char)
     Next match
     
